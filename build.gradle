@@ -10,7 +10,9 @@ repositories {
 def allureVersion = "2.13.8",
     selenideVersion = "5.20.1",
     junitVersion = "5.7.1",
-    aspectJweaverVersion = "1.9.6"
+    fakerVersion = "1.0.2",
+    aspectJweaverVersion = "1.9.6",
+    ownerVersion = "1.0.12"
 
 allure {
     version = allureVersion
@@ -27,8 +29,8 @@ dependencies {
             "org.aspectj:aspectjweaver:$aspectJweaverVersion",
             "com.codeborne:selenide:$selenideVersion",
             "io.qameta.allure:allure-selenide:$allureVersion",
-            "com.github.javafaker:javafaker:1.0.2",
-
+            "com.github.javafaker:javafaker:$fakerVersion",
+            "org.aeonbits.owner:owner:$ownerVersion",
             "org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
@@ -37,6 +39,17 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType(Test) {
+    systemProperties(System.getProperties())
+        testLogging {
+            lifecycle {
+//                events "started", "failed"
+                events "started", "skipped", "failed", "standard_error", "standard_out"
+                exceptionFormat "short"
+            }
+        }
 }
 
 test {
