@@ -1,7 +1,9 @@
 package tests;
 
 import com.codeborne.selenide.Configuration;
+import config.DriverConfig;
 import io.qameta.allure.selenide.AllureSelenide;
+import org.aeonbits.owner.ConfigFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -11,6 +13,9 @@ import static com.codeborne.selenide.logevents.SelenideLogger.addListener;
 import static helpers.AttachmentHelper.*;
 
 public class BaseTest {
+
+    static DriverConfig driverConfig = ConfigFactory.create(DriverConfig.class);
+
     @BeforeAll
     static void setup() {
         addListener("AllureSelenide", new AllureSelenide());
@@ -19,10 +24,12 @@ public class BaseTest {
         capabilities.setCapability("enableVideo", true);
         Configuration.browserCapabilities = capabilities;
         Configuration.browser = System.getProperty("web.browser", "chrome");
-//        Configuration.remote = "https://user1:1234@selenoid.autotests.cloud/wd/hub/";
         String remoteDriver = System.getProperty("remote.webdriver");
-        if (remoteDriver != null)
-            Configuration.remote = remoteDriver;
+        if (remoteDriver != null){
+            String user = driverConfig.remoteWebUser();
+            String password = driverConfig.remoteWebPassword();
+            Configuration.remote = String.format(remoteDriver, user, password);
+        }
     }
 
     @AfterEach
